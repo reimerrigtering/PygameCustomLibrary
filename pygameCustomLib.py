@@ -1169,4 +1169,5 @@ def help_commands(problem=None):
         print('define first scene - Scene.selectedScene = ...')
     else:
         print(helpString)
->>>>>>> 85cecf98f9fe86f52d9e6264b411d3f40437853e
+
+# test commit
