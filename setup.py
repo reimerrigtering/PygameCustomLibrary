@@ -6,5 +6,5 @@ setup(
     author='Reimer Rigtering',
     author_email='reimer.rigtering@gmail.com',
     url='https://github.com/reimerrigtering/PygameCustomLibrary',
-    packages=find_packages()
+    packages=find_packages(exclude='tests*')
 )
