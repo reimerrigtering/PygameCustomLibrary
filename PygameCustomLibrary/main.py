@@ -5,7 +5,6 @@ pygame.font.init()
 
 
 # --- Mechanic classes
-# TODO: check if vector class works
 class Vector:
     def __init__(self, xStart: int = 0, yStart: int = 0, x: float = 0, y: float = 0):
         self.xStart = xStart
@@ -570,7 +569,7 @@ def help_commands(problem=None):
     Help Menu
     -------------------------------------------------------------------
     Classes:
-    Frame, Sprite, Animation, Text, Shape, Button
+    Vector, Frame, Sprite, Animation, Text, Shape, Button
     --------------------------------------------------------------------
     Special Lines:
     Animation.update_cls_list()     --> update all animation frames
