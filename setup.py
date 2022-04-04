@@ -7,5 +7,5 @@ setup(
     author_email='reimer.rigtering@gmail.com',
     url='https://github.com/reimerrigtering/PygameCustomLibrary',
     requires=['pygame'],
-    packages=find_packages(exclude='tests*')
+    packages=['PygameCustomLibrary']
 )
