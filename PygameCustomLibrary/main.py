@@ -254,13 +254,6 @@ class Animation:
         self.startFrame = currentFrame - self.frameInCycle
 
 
-# --- Audio classes
-# IDEA: music class
-
-
-# IDEA: sound class
-
-
 # --- object classes
 class Text:
     def __init__(self, txt: str = '', txtColor: tuple[int, int, int] = (0, 0, 0), x: int = 0, y: int = 0,
