@@ -553,7 +553,8 @@ class Board:
 
     # FINISH BOARD.TILE class
     class Tile:
-        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, tags: list = None):
+        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, sortBoard: bool = True,
+                     tags: list = None):
             self.x = x
             self.y = y
             self.sprite = sprite
@@ -568,6 +569,8 @@ class Board:
                         added = True
                 if not added:
                     addToBoard.board.append(self)
+                    if sortBoard:
+                        addToBoard.sort()
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
