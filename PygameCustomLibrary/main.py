@@ -95,6 +95,9 @@ class Vector:
         return f'{self.x}, {self.y}'
 
 
+# IDEA TAG class
+
+
 # --- Video classes
 class Frame:
     frame = 0
@@ -529,11 +532,11 @@ class Button:
         self.buttonPressed = False
 
 
-# IDEA fill-up bar class
+# IDEA FILL-UP BAR class
 
 
 # --- Scene classes
-# FINISH board class
+# FINISH BOARD class
 class Board:
     def __init__(self, length, width):
         self.length = length
@@ -544,32 +547,34 @@ class Board:
         numBoardLength = len(str(self.length))
         numBoardWidth = len(str(self.width))
         try:
-            self.board.sort(key=lambda a: int(str(a.x).zfill(numBoardWidth) + str(a.y).zfill(numBoardLength)))
+            self.board.sort(key=lambda a: int(str(a.y).zfill(numBoardLength) + str(a.x).zfill(numBoardWidth)))
         finally:
             pass
 
-    # FINISH board.tile class
+    # FINISH BOARD.TILE class
     class Tile:
-        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None):
+        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, tags: list = None):
             self.x = x
             self.y = y
             self.sprite = sprite
             self.board = addToBoard
+            self.tags = tags
 
             if addToBoard is not None:
                 added = False
-                for index, tile in enumerate(addToBoard):
+                for index, tile in enumerate(addToBoard.board):
                     if tile.x == self.x and tile.y == self.y:
-                        addToBoard[index] = self
+                        addToBoard.board[index] = self
                         added = True
                 if not added:
-                    addToBoard.append(self)
+                    addToBoard.board.append(self)
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
 
     def __repr__(self):
-        return self.board
+        return str(self.board)
+
 
 class Scene:
     selectedScene = None
