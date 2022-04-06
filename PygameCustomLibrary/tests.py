@@ -1,29 +1,15 @@
-import main
-import pygame
-
-WIDTH, HEIGHT = 600, 600
-
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('test')
-
-
-def updateWindow():
-    pygame.display.update()
+from main import *
 
 
 def main():
-    test = True
+    board = Board(5, 5)
 
-    while test:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                test = False
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    test = False
-
-        updateWindow()
+    testTile1 = Board.Tile(3, 2, addToBoard=board)
+    testTile2 = Board.Tile(2, 2, addToBoard=board)
+    testTile3 = Board.Tile(4, 1, addToBoard=board)
+    print(board)
+    board.sort()
+    print(board)
 
 
 if __name__ == "__main__":
