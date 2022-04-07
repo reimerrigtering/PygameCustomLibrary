@@ -534,22 +534,168 @@ class Button:
 
 # FINISH FILL-UP BAR class
 class Bar:
+    removeFromBar = []
+    addToBar = []
+
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
-                 currentVolume: float = None, barColor: tuple[int, int, int] = (0, 0, 0),
-                 barLevelMeter: Union[tuple[int, int, int, int], pygame.Rect] = None,
-                 barLevelMeterColor: tuple[int, int, int] = (0, 0, 0)):
+                 currentVolume: float = 0.0, barColor: tuple[int, int, int] = (0, 0, 0),
+                 barBG: tuple[int, int, int] = (0, 0, 0), barLevelMeter: bool = False,
+                 barLevelMeterWidth: int = None, barLevelMeterHeight: int = None,
+                 barLevelMeterColor: tuple[int, int, int] = (0, 0, 0), barSurroundWidth: int = 0,
+                 barSurroundColor: tuple[int, int, int] = (0, 0, 0), fillFromSide: str = None,
+                 endFrame: int = None):
 
         self.totalVolume = totalVolume
-
-        if currentVolume is None:
-            self.currentVolume = totalVolume
-        else:
-            self.currentVolume = currentVolume
+        self.currentVolume = currentVolume
+        self.barColor = barColor
+        self.barBG = barBG
+        self.barLevelMeterColor = barLevelMeterColor
+        self.barSurroundWidth = barSurroundWidth
+        self.barSurroundColor = barSurroundColor
+        self.endFrame = endFrame
 
         if type(rect) == tuple:
-            self.buttonRect = pygame.Rect(rect)
+            self.barRect = pygame.Rect(rect)
         else:
-            self.buttonRect = rect
+            self.barRect = rect
+
+        if fillFromSide == 'r' or fillFromSide == 'b':
+            self.fillFromSide = fillFromSide
+        else:
+            if self.barRect.width >= self.barRect.height:
+                self.fillFromSide = 'r'
+            else:
+                self.fillFromSide = 'b'
+
+        if barLevelMeter:
+            if barLevelMeterWidth is None:
+                if self.fillFromSide == 'b':
+                    self.barLevelMeterWidth = self.barRect.width + 2
+                else:
+                    self.barLevelMeterWidth = 2
+            else:
+                self.barLevelMeterWidth = barLevelMeterWidth
+
+            if barLevelMeterHeight is None:
+                if self.fillFromSide == 'r':
+                    self.barLevelMeterHeight = self.barRect.height + 2
+                else:
+                    self.barLevelMeterHeight = 2
+            else:
+                self.barLevelMeterHeight = barLevelMeterHeight
+        else:
+            self.barLevelMeterWidth = 0
+            self.barLevelMeterHeight = 0
+
+        self.barSurroundRect = pygame.Rect(self.barRect.x - self.barSurroundWidth,
+                                           self.barRect.y - self.barSurroundWidth,
+                                           self.barRect.width + 2 * self.barSurroundWidth,
+                                           self.barRect.height + 2 * self.barSurroundWidth)
+
+        if self.fillFromSide == 'b':
+            levelMeterExtend = (self.barLevelMeterWidth - self.barRect.width) / 2
+            self.barLevelMeter = pygame.Rect(self.barRect.x - levelMeterExtend,
+                                             self.barRect.y - self.barLevelMeterHeight,
+                                             self.barLevelMeterWidth, self.barLevelMeterHeight)
+        else:
+            levelMeterExtend = (self.barLevelMeterHeight - self.barRect.height) / 2
+            self.barLevelMeter = pygame.Rect(self.barRect.x + self.barRect.width,
+                                             self.barRect.y - levelMeterExtend,
+                                             self.barLevelMeterWidth, self.barLevelMeterHeight)
+
+    def set_meter_percent(self, percentage: float = 0.0):
+        self.currentVolume = self.totalVolume * percentage / 100
+
+    def get_meter_percent(self, value=None):
+        if value is None:
+            value = self.currentVolume
+        percent = value / self.totalVolume * 100
+        if percent < 0:
+            percent = 0
+        return percent
+
+    def get_value_from_percent(self, percent):
+        value = self.totalVolume * percent / 100
+        return value
+
+    def remove(self, value: float = 1.0, percentage: bool = False, slowRemove: bool = True):
+        if percentage:
+            value = self.get_value_from_percent(value)
+
+        if slowRemove:
+            Bar.removeFromBar.append(self)
+            self.endFrame = Frame.frame + value
+        else:
+            self.currentVolume -= value
+
+        if self in Bar.addToBar:
+            Bar.addToBar.remove(self)
+
+    def add(self, value: float = 1.0, percentage: bool = False, slowAdd: bool = True):
+        if percentage:
+            value = self.get_value_from_percent(value)
+
+        if slowAdd:
+            Bar.addToBar.append(self)
+            self.endFrame = Frame.frame + value
+        else:
+            self.currentVolume += value
+
+        if self in Bar.removeFromBar:
+            Bar.removeFromBar.remove(self)
+
+    def render_level_meter(self, display):
+        percent = self.get_meter_percent()
+        if self.fillFromSide == 'b':
+            barLength = self.barRect.height * percent / 100
+
+            levelMeterExtend = (self.barLevelMeterWidth - self.barRect.width) / 2
+            self.barLevelMeter = pygame.Rect(self.barRect.x - levelMeterExtend,
+                                             self.barRect.y + self.barRect.height - barLength -
+                                             self.barLevelMeterHeight,
+                                             self.barLevelMeterWidth, self.barLevelMeterHeight)
+        else:
+            barLength = self.barRect.width * percent / 100
+
+            levelMeterExtend = (self.barLevelMeterHeight - self.barRect.height) / 2
+            self.barLevelMeter = pygame.Rect(self.barRect.x + barLength,
+                                             self.barRect.y - levelMeterExtend,
+                                             self.barLevelMeterWidth, self.barLevelMeterHeight)
+
+        pygame.draw.rect(display, self.barLevelMeterColor, self.barLevelMeter)
+
+    def render_bar(self, display):
+        percent = self.get_meter_percent()
+        if self.fillFromSide == 'b':
+            barLength = self.barRect.height * percent / 100
+            bar = pygame.Rect(self.barRect.x, self.barRect.y + self.barRect.height - barLength,
+                              self.barRect.width, barLength)
+
+        else:
+            barLength = self.barRect.width * percent / 100
+            bar = pygame.Rect(self.barRect.x, self.barRect.y, barLength, self.barRect.height)
+
+        pygame.draw.rect(display, self.barBG, self.barRect)
+        pygame.draw.rect(display, self.barColor, bar)
+
+    def render(self, display):
+        self.render_bar(display)
+        self.render_level_meter(display)
+
+    def update_bar_animation(self):
+        if self in Bar.removeFromBar:
+            self.currentVolume -= 1
+            if self.endFrame == Frame.frame:
+                Bar.removeFromBar.remove(self)
+        if self in Bar.addToBar:
+            self.currentVolume += 1
+            if self.endFrame == Frame.frame:
+                Bar.addToBar.remove(self)
+
+    @classmethod
+    def update_cls_list(cls):
+        for bar in cls.removeFromBar + cls.addToBar:
+            bar.update_bar_animation()
 
 
 # --- Scene classes
@@ -561,10 +707,9 @@ class Board:
         self.board = []
 
     def sort(self):
-        numBoardLength = len(str(self.length))
         numBoardWidth = len(str(self.width))
         try:
-            self.board.sort(key=lambda a: int(str(a.y).zfill(numBoardLength) + str(a.x).zfill(numBoardWidth)))
+            self.board.sort(key=lambda a: int(str(a.y) + str(a.x).zfill(numBoardWidth)))
         finally:
             pass
 
@@ -628,14 +773,17 @@ def help_commands(problem=None):
     Help Menu
     -------------------------------------------------------------------
     Classes:
-    Vector, Frame, Sprite, Animation, Text, Shape, Button
+    Vector, Frame, Sprite, Animation, Text, Shape, Button, Bar, Board, Board.Tile, Scene
     --------------------------------------------------------------------
     Special Lines:
     Animation.update_cls_list()     --> update all animation frames
+    Bar.update_cls_list()           --> update all animated bars
     Scene.selectedScene = ...       --> define first scene
     """
     if problem == Animation:
         print('continuing animation frames - Animation.update_cls_list()')
+    elif problem == Bar:
+        print('continuing bar slowAdd / slowRemove - Bar.updat_cls.list()')
     elif problem == Scene:
         print('define first scene - Scene.selectedScene = ...')
     else:
