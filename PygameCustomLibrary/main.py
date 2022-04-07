@@ -532,7 +532,24 @@ class Button:
         self.buttonPressed = False
 
 
-# IDEA FILL-UP BAR class
+# FINISH FILL-UP BAR class
+class Bar:
+    def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
+                 currentVolume: float = None, barColor: tuple[int, int, int] = (0, 0, 0),
+                 barLevelMeter: Union[tuple[int, int, int, int], pygame.Rect] = None,
+                 barLevelMeterColor: tuple[int, int, int] = (0, 0, 0)):
+
+        self.totalVolume = totalVolume
+
+        if currentVolume is None:
+            self.currentVolume = totalVolume
+        else:
+            self.currentVolume = currentVolume
+
+        if type(rect) == tuple:
+            self.buttonRect = pygame.Rect(rect)
+        else:
+            self.buttonRect = rect
 
 
 # --- Scene classes
