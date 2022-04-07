@@ -537,6 +537,8 @@ class Bar:
     removeFromBar = []
     addToBar = []
 
+    # TODO add bar name functionality
+    # TODO add custom slowAdd and slowRemove speeds
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
                  currentVolume: float = 0.0, barColor: tuple[int, int, int] = (0, 0, 0),
                  barBG: tuple[int, int, int] = (0, 0, 0), barLevelMeter: bool = False,
