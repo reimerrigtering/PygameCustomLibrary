@@ -95,6 +95,18 @@ class Vector:
         return f'{self.x}, {self.y}'
 
 
+class Direction:
+    LEFT = 'l'
+    RIGHT = 'r'
+    TOP = 't'
+    BOTTOM = 'b'
+    CENTER = 'c'
+    I_LEFT = 'il'
+    I_RIGHT = 'ir'
+    I_TOP = 'it'
+    I_BOTTOM = 'ib'
+
+
 # IDEA TAG class
 
 
@@ -344,18 +356,18 @@ class Shape:
 
 class Button:
     BUTTON_TYPES = ('switch', 'push')
-    ALIGNMENTS = ('l', 'c', 'r')
+    ALIGNMENTS = ('il', 'c', 'ir')
 
     buttonList = []
     pushButtonList = []
 
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect],
                  buttonColor: tuple[int, int, int] = (255, 255, 255), txt: str = '',
-                 txtColor: tuple[int, int, int] = (0, 0, 0), alignTxt: str = 'c',
+                 txtColor: tuple[int, int, int] = (0, 0, 0), alignTxt: str = Direction.CENTER,
                  font: str = 'helvetica', fontSize: int = None, txtBold: bool = False, txtItalic: bool = False,
                  topTxtGap: int = 5, sideTxtGap: int = 5, img: Union[Sprite, Animation] = None,
-                 alignImg: str = 'c', imgSize: tuple[int, int] = None, topImgGap: int = 5, sideImgGap: int = 5,
-                 button3D: bool = False, buttonShadowColor: tuple[int, int, int] = (0, 0, 0),
+                 alignImg: str = Direction.CENTER, imgSize: tuple[int, int] = None, topImgGap: int = 5,
+                 sideImgGap: int = 5, button3D: bool = False, buttonShadowColor: tuple[int, int, int] = (0, 0, 0),
                  buttonShadowDepth: int = 3, buttonPressed: bool = False, buttonType: str = 'switch',
                  inButtonList: bool = True):
 
@@ -381,12 +393,14 @@ class Button:
             self.buttonType = 'switch'
         else:
             self.buttonType = buttonType
+
         if alignTxt not in Button.ALIGNMENTS:
-            self.alignTxt = 'c'
+            self.alignTxt = Direction.CENTER
         else:
             self.alignTxt = alignTxt
+
         if alignImg not in Button.ALIGNMENTS:
-            self.alignImg = 'c'
+            self.alignImg = Direction.CENTER
         else:
             self.alignImg = alignImg
 
@@ -451,10 +465,10 @@ class Button:
         else:
             xyCorrection = 0
 
-        if self.alignTxt == 'r':
+        if self.alignTxt == Direction.I_RIGHT:
             txtXPos = self.buttonRect.x + self.buttonRect.width - self.sideTxtGap - self.buttonText.get_width()\
                       - xyCorrection
-        elif self.alignTxt == 'l':
+        elif self.alignTxt == Direction.I_LEFT:
             txtXPos = self.buttonRect.x + self.sideTxtGap - xyCorrection
         else:
             txtXPos = self.buttonRect.x + (self.buttonRect.width - self.buttonText.get_width()) // 2 - xyCorrection
@@ -481,9 +495,9 @@ class Button:
         else:
             xyCorrection = 0
 
-        if self.alignImg == 'r':
+        if self.alignImg == Direction.I_RIGHT:
             self.img.x = self.buttonRect.x + self.buttonRect.width - self.sideImgGap - self.img.width - xyCorrection
-        elif self.alignImg == 'l':
+        elif self.alignImg == Direction.I_LEFT:
             self.img.x = self.buttonRect.x + self.sideImgGap - xyCorrection
         else:
             self.img.x = self.buttonRect.x + (self.buttonRect.width - self.img.width) // 2 - xyCorrection
@@ -534,53 +548,80 @@ class Button:
 
 # FINISH FILL-UP BAR class
 class Bar:
+    ALIGNMENTS = ('l', 'il', 'c', 'r', 'ir', 't', 'it', 'b', 'ib')
+
     removeFromBar = []
     addToBar = []
 
     # TODO add bar name functionality
     # TODO add custom slowAdd and slowRemove speeds
+    # FIXME spam slowRemove
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
                  currentVolume: float = 0.0, barColor: tuple[int, int, int] = (0, 0, 0),
                  barBG: tuple[int, int, int] = (0, 0, 0), barLevelMeter: bool = False,
                  barLevelMeterWidth: int = None, barLevelMeterHeight: int = None,
                  barLevelMeterColor: tuple[int, int, int] = (0, 0, 0), barSurroundWidth: int = 0,
-                 barSurroundColor: tuple[int, int, int] = (0, 0, 0), fillFromSide: str = None,
-                 endFrame: int = None):
+                 barSurroundColor: tuple[int, int, int] = (0, 0, 0), fillFromSide: str = Direction.RIGHT,
+                 animationSpeed: float = 1.0, txt: str = '', txtColor: tuple[int, int, int] = (0, 0, 0),
+                 font: str = 'helvetica', fontSize: int = None, txtBold: bool = False, txtItalic: bool = False,
+                 topTxtGap: int = None, sideTxtGap: int = None, alignTxt: str = Direction.TOP,
+                 alignTxtToBar: bool = False):
 
         self.totalVolume = totalVolume
-        self.currentVolume = currentVolume
+        self.currentVolume = self.realBarVolume = currentVolume
         self.barColor = barColor
         self.barBG = barBG
         self.barLevelMeterColor = barLevelMeterColor
         self.barSurroundWidth = barSurroundWidth
         self.barSurroundColor = barSurroundColor
-        self.endFrame = endFrame
+        self.animationSpeed = animationSpeed
+        self.txt = txt
+        self.txtColor = txtColor
+        self.font = font
+        self.txtBold = txtBold
+        self.txtItalic = txtItalic
+        self.alignTxtToBar = alignTxtToBar
+
+        if topTxtGap is None:
+            self.topTxtGap = 3
+        else:
+            self.topTxtGap = topTxtGap
+
+        if sideTxtGap is None:
+            self.sideTxtGap = 3
+        else:
+            self.sideTxtGap = sideTxtGap
 
         if type(rect) == tuple:
             self.barRect = pygame.Rect(rect)
         else:
             self.barRect = rect
 
-        if fillFromSide == 'r' or fillFromSide == 'b':
+        if fontSize is None:
+            self.fontSize = self.barRect.height - 2 * self.topTxtGap
+        else:
+            self.fontSize = fontSize
+
+        if fillFromSide == Direction.RIGHT or fillFromSide == Direction.BOTTOM:
             self.fillFromSide = fillFromSide
         else:
             if self.barRect.width >= self.barRect.height:
-                self.fillFromSide = 'r'
+                self.fillFromSide = Direction.RIGHT
             else:
-                self.fillFromSide = 'b'
+                self.fillFromSide = Direction.BOTTOM
 
         if barLevelMeter:
             if barLevelMeterWidth is None:
-                if self.fillFromSide == 'b':
-                    self.barLevelMeterWidth = self.barRect.width + 2
+                if self.fillFromSide == Direction.BOTTOM:
+                    self.barLevelMeterWidth = self.barRect.width
                 else:
                     self.barLevelMeterWidth = 2
             else:
                 self.barLevelMeterWidth = barLevelMeterWidth
 
             if barLevelMeterHeight is None:
-                if self.fillFromSide == 'r':
-                    self.barLevelMeterHeight = self.barRect.height + 2
+                if self.fillFromSide == Direction.RIGHT:
+                    self.barLevelMeterHeight = self.barRect.height
                 else:
                     self.barLevelMeterHeight = 2
             else:
@@ -594,7 +635,7 @@ class Bar:
                                            self.barRect.width + 2 * self.barSurroundWidth,
                                            self.barRect.height + 2 * self.barSurroundWidth)
 
-        if self.fillFromSide == 'b':
+        if self.fillFromSide == Direction.BOTTOM:
             levelMeterExtend = (self.barLevelMeterWidth - self.barRect.width) / 2
             self.barLevelMeter = pygame.Rect(self.barRect.x - levelMeterExtend,
                                              self.barRect.y - self.barLevelMeterHeight,
@@ -605,12 +646,27 @@ class Bar:
                                              self.barRect.y - levelMeterExtend,
                                              self.barLevelMeterWidth, self.barLevelMeterHeight)
 
-    def set_meter_percent(self, percentage: float = 0.0):
-        self.currentVolume = self.totalVolume * percentage / 100
+        if alignTxt not in Bar.ALIGNMENTS:
+            self.alignTxt = Direction.TOP
+        else:
+            self.alignTxt = alignTxt
 
-    def get_meter_percent(self, value=None):
+        self.barFont = pygame.font.SysFont(self.font, self.fontSize, self.txtBold, self.txtItalic)
+        self.barText = self.barFont.render(self.txt, True, self.txtColor)
+
+    def update_bar_txt(self):
+        self.barFont = pygame.font.SysFont(self.font, self.fontSize, self.txtBold, self.txtItalic)
+        self.barText = self.barFont.render(self.txt, True, self.txtColor)
+
+    def set_meter_percent(self, percentage: float = 0.0):
+        self.currentVolume = self.realBarVolume = self.totalVolume * percentage / 100
+
+    def get_meter_percent(self, value=None, realVolume: bool = False):
         if value is None:
-            value = self.currentVolume
+            if not realVolume:
+                value = self.currentVolume
+            else:
+                value = self.realBarVolume
         percent = value / self.totalVolume * 100
         if percent < 0:
             percent = 0
@@ -620,35 +676,104 @@ class Bar:
         value = self.totalVolume * percent / 100
         return value
 
-    def remove(self, value: float = 1.0, percentage: bool = False, slowRemove: bool = True):
+    def remove(self, value: float = 1.0, percentage: bool = False, slowRemove: bool = True, speed: float = 1.0):
+        self.animationSpeed = speed
         if percentage:
             value = self.get_value_from_percent(value)
+        if self.realBarVolume - value < 0:
+            self.realBarVolume = 0
+        else:
+            self.realBarVolume -= value
 
         if slowRemove:
             Bar.removeFromBar.append(self)
-            self.endFrame = Frame.frame + value
         else:
             self.currentVolume -= value
 
-        if self in Bar.addToBar:
-            Bar.addToBar.remove(self)
-
-    def add(self, value: float = 1.0, percentage: bool = False, slowAdd: bool = True):
+    def add(self, value: float = 1.0, percentage: bool = False, slowAdd: bool = True, speed: float = 1.0):
+        self.animationSpeed = speed
         if percentage:
             value = self.get_value_from_percent(value)
+        if self.realBarVolume + value > self.totalVolume:
+            self.realBarVolume = self.totalVolume
+        else:
+            self.realBarVolume += value
 
         if slowAdd:
             Bar.addToBar.append(self)
-            self.endFrame = Frame.frame + value
         else:
             self.currentVolume += value
 
-        if self in Bar.removeFromBar:
-            Bar.removeFromBar.remove(self)
+    def render_bar_txt(self, display):
+        if self.alignTxtToBar:
+            percent = self.get_meter_percent()
+            if self.fillFromSide == Direction.BOTTOM:
+                barLength = self.barRect.height * percent / 100
+                bar = pygame.Rect(self.barRect.x, self.barRect.y + self.barRect.height - barLength,
+                                  self.barRect.width, barLength)
+
+            else:
+                barLength = self.barRect.width * percent / 100
+                bar = pygame.Rect(self.barRect.x, self.barRect.y, barLength, self.barRect.height)
+        else:
+            bar = self.barRect
+
+        if self.alignTxt == Direction.LEFT:
+            txtXPos = bar.x - self.sideTxtGap - self.barText.get_width()
+            txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+        elif self.alignTxt == Direction.I_LEFT:
+            txtXPos = bar.x + self.sideTxtGap
+            txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+        elif self.alignTxt == Direction.CENTER:
+            txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
+            txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+        elif self.alignTxt == Direction.RIGHT:
+            txtXPos = bar.x + bar.width + self.sideTxtGap
+            txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+        elif self.alignTxt == Direction.I_RIGHT:
+            txtXPos = bar.x + bar.width - self.sideTxtGap - self.barText.get_width()
+            txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+        elif self.alignTxt == Direction.TOP:
+            txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
+            txtYPos = bar.y - self.sideTxtGap - self.barText.get_height()
+        elif self.alignTxt == Direction.I_TOP:
+            txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
+            txtYPos = bar.y + self.sideTxtGap
+        elif self.alignTxt == Direction.BOTTOM:
+            txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
+            txtYPos = bar.y + bar.height + self.sideTxtGap
+        else:
+            txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
+            txtYPos = bar.y + bar.height - self.sideTxtGap - self.barText.get_height()
+
+        if self.alignTxtToBar:
+            if txtXPos < bar.x + self.sideTxtGap and self.alignTxt != Direction.LEFT:
+                txtXPos = bar.x + self.sideTxtGap
+
+            elif txtXPos < bar.x - self.sideTxtGap - self.barText.get_width() and self.alignTxt == Direction.LEFT:
+                txtXPos = bar.x - self.sideTxtGap - self.barText.get_width()
+
+            elif txtXPos > bar.x + bar.width and self.alignTxt != Direction.RIGHT:
+                txtXPos = bar.x + bar.width
+
+            elif txtXPos > bar.x + bar.width + self.barText.get_width() and self.alignTxt == Direction.RIGHT:
+                txtXPos = bar.x + bar.width - self.sideTxtGap - self.barText.get_width()
+        else:
+            if txtXPos < self.sideTxtGap:
+                txtXPos = self.sideTxtGap
+            elif txtXPos > display.get_width():
+                txtXPos = display.get_width() - self.sideTxtGap - self.barText.get_width()
+
+        if txtYPos < self.topTxtGap:
+            txtYPos = self.topTxtGap
+        elif txtYPos > display.get_height():
+            txtYPos = display.get_height() - self.topTxtGap - self.barText.get_height()
+
+        display.blit(self.barText, (txtXPos, txtYPos))
 
     def render_level_meter(self, display):
         percent = self.get_meter_percent()
-        if self.fillFromSide == 'b':
+        if self.fillFromSide == Direction.BOTTOM:
             barLength = self.barRect.height * percent / 100
 
             levelMeterExtend = (self.barLevelMeterWidth - self.barRect.width) / 2
@@ -668,7 +793,7 @@ class Bar:
 
     def render_bar(self, display):
         percent = self.get_meter_percent()
-        if self.fillFromSide == 'b':
+        if self.fillFromSide == Direction.BOTTOM:
             barLength = self.barRect.height * percent / 100
             bar = pygame.Rect(self.barRect.x, self.barRect.y + self.barRect.height - barLength,
                               self.barRect.width, barLength)
@@ -683,15 +808,21 @@ class Bar:
     def render(self, display):
         self.render_bar(display)
         self.render_level_meter(display)
+        self.render_bar_txt(display)
 
     def update_bar_animation(self):
-        if self in Bar.removeFromBar:
-            self.currentVolume -= 1
-            if self.endFrame == Frame.frame:
+        if self.realBarVolume < self.currentVolume:
+            self.currentVolume -= self.animationSpeed
+            if self.currentVolume <= self.realBarVolume:
                 Bar.removeFromBar.remove(self)
-        if self in Bar.addToBar:
-            self.currentVolume += 1
-            if self.endFrame == Frame.frame:
+        elif self.realBarVolume > self.currentVolume:
+            self.currentVolume += self.animationSpeed
+            if self.currentVolume >= self.realBarVolume:
+                Bar.addToBar.remove(self)
+        else:
+            if self in Bar.removeFromBar:
+                Bar.removeFromBar.remove(self)
+            if self in Bar.addToBar:
                 Bar.addToBar.remove(self)
 
     @classmethod
