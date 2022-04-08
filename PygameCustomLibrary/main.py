@@ -546,16 +546,12 @@ class Button:
         self.buttonPressed = False
 
 
-# FINISH FILL-UP BAR class
 class Bar:
     ALIGNMENTS = ('l', 'il', 'c', 'r', 'ir', 't', 'it', 'b', 'ib')
 
     removeFromBar = []
     addToBar = []
 
-    # TODO add bar name functionality
-    # TODO add custom slowAdd and slowRemove speeds
-    # FIXME spam slowRemove
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
                  currentVolume: float = 0.0, barColor: tuple[int, int, int] = (0, 0, 0),
                  barBG: tuple[int, int, int] = (0, 0, 0), barLevelMeter: bool = False,
