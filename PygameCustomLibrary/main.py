@@ -593,10 +593,19 @@ class Bar:
         else:
             self.barRect = rect
 
-        if fontSize is None:
-            self.fontSize = self.barRect.height - 2 * self.topTxtGap
+        if txt != '':
+            if fontSize is None:
+                fontMaxHeight = self.barRect.height - 2 * self.topTxtGap
+                fontMaxWidth = ((self.barRect.width - 2 * self.sideTxtGap) // len(self.txt)) * 2
+
+                if fontMaxWidth <= fontMaxHeight:
+                    self.fontSize = fontMaxWidth
+                else:
+                    self.fontSize = fontMaxHeight
+            else:
+                self.fontSize = fontSize
         else:
-            self.fontSize = fontSize
+            self.fontSize = 10
 
         if fillFromSide == Direction.RIGHT or fillFromSide == Direction.BOTTOM:
             self.fillFromSide = fillFromSide
