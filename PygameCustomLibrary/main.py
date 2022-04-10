@@ -554,7 +554,7 @@ class Bar:
 
     def __init__(self, rect: Union[tuple[int, int, int, int], pygame.Rect], totalVolume: float = 1.0,
                  currentVolume: float = 0.0, barColor: tuple[int, int, int] = (0, 0, 0),
-                 barBG: tuple[int, int, int] = (0, 0, 0), barLevelMeter: bool = False,
+                 barBG: tuple[int, int, int, ...] = (0, 0, 0, 255), barLevelMeter: bool = False,
                  barLevelMeterWidth: int = None, barLevelMeterHeight: int = None,
                  barLevelMeterColor: tuple[int, int, int] = (0, 0, 0), barSurroundWidth: int = 0,
                  barSurroundColor: tuple[int, int, int] = (0, 0, 0), fillFromSide: str = Direction.RIGHT,
@@ -667,7 +667,7 @@ class Bar:
     def set_meter_percent(self, percentage: float = 0.0):
         self.currentVolume = self.realBarVolume = self.totalVolume * percentage / 100
 
-    def get_meter_percent(self, value=None, realVolume: bool = False, decimals: int = 1):
+    def get_meter_percent(self, value=None, realVolume: bool = False, decimals: int = 1) -> float:
         if value is None:
             if not realVolume:
                 value = self.currentVolume
@@ -678,7 +678,7 @@ class Bar:
             percent = 0.0
         return percent
 
-    def get_value_from_percent(self, percent):
+    def get_value_from_percent(self, percent) -> float or int:
         value = self.totalVolume * percent / 100
         return value
 
@@ -824,7 +824,9 @@ class Bar:
             barLength = self.barRect.width * percent / 100
             bar = pygame.Rect(self.barRect.x, self.barRect.y, barLength, self.barRect.height)
 
-        pygame.draw.rect(display, self.barBG, self.barRect)
+        bg = pygame.Surface((self.barRect.width, self.barRect.height)).convert_alpha()
+        bg.fill(self.barBG)
+        display.blit(bg, (self.barRect.x, self.barRect.y))
         pygame.draw.rect(display, self.barColor, bar)
 
     def render(self, display):
