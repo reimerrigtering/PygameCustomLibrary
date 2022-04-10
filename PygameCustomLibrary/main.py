@@ -561,7 +561,7 @@ class Bar:
                  animationSpeed: float = 1.0, txt: str = '', txtColor: tuple[int, int, int] = (0, 0, 0),
                  font: str = 'helvetica', fontSize: int = None, txtBold: bool = False, txtItalic: bool = False,
                  topTxtGap: int = None, sideTxtGap: int = None, alignTxt: str = Direction.TOP,
-                 alignTxtToBar: bool = False):
+                 alignTxtToBar: bool = False, updateTxtWithRender: bool = False):
 
         self.totalVolume = totalVolume
         self.currentVolume = self.realBarVolume = currentVolume
@@ -577,6 +577,7 @@ class Bar:
         self.txtBold = txtBold
         self.txtItalic = txtItalic
         self.alignTxtToBar = alignTxtToBar
+        self.updateTextWithRender = updateTxtWithRender
 
         if topTxtGap is None:
             self.topTxtGap = 3
@@ -666,15 +667,15 @@ class Bar:
     def set_meter_percent(self, percentage: float = 0.0):
         self.currentVolume = self.realBarVolume = self.totalVolume * percentage / 100
 
-    def get_meter_percent(self, value=None, realVolume: bool = False):
+    def get_meter_percent(self, value=None, realVolume: bool = False, decimals: int = 1):
         if value is None:
             if not realVolume:
                 value = self.currentVolume
             else:
                 value = self.realBarVolume
-        percent = value / self.totalVolume * 100
+        percent = round(value / self.totalVolume * 100, decimals)
         if percent < 0:
-            percent = 0
+            percent = 0.0
         return percent
 
     def get_value_from_percent(self, percent):
@@ -710,6 +711,9 @@ class Bar:
             self.currentVolume += value
 
     def render_bar_txt(self, display):
+        if self.updateTextWithRender:
+            self.update_bar_txt()
+
         if self.alignTxtToBar:
             percent = self.get_meter_percent()
             if self.fillFromSide == Direction.BOTTOM:
@@ -726,27 +730,35 @@ class Bar:
         if self.alignTxt == Direction.LEFT:
             txtXPos = bar.x - self.sideTxtGap - self.barText.get_width()
             txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+
         elif self.alignTxt == Direction.I_LEFT:
             txtXPos = bar.x + self.sideTxtGap
             txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+
         elif self.alignTxt == Direction.CENTER:
             txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
             txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+
         elif self.alignTxt == Direction.RIGHT:
             txtXPos = bar.x + bar.width + self.sideTxtGap
             txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+
         elif self.alignTxt == Direction.I_RIGHT:
             txtXPos = bar.x + bar.width - self.sideTxtGap - self.barText.get_width()
             txtYPos = bar.y + (bar.height - self.barText.get_height()) // 2
+
         elif self.alignTxt == Direction.TOP:
             txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
             txtYPos = bar.y - self.sideTxtGap - self.barText.get_height()
+
         elif self.alignTxt == Direction.I_TOP:
             txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
             txtYPos = bar.y + self.sideTxtGap
+
         elif self.alignTxt == Direction.BOTTOM:
             txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
             txtYPos = bar.y + bar.height + self.sideTxtGap
+
         else:
             txtXPos = bar.x + (bar.width - self.barText.get_width()) // 2
             txtYPos = bar.y + bar.height - self.sideTxtGap - self.barText.get_height()
@@ -769,10 +781,15 @@ class Bar:
             elif txtXPos > display.get_width():
                 txtXPos = display.get_width() - self.sideTxtGap - self.barText.get_width()
 
-        if txtYPos < self.topTxtGap:
-            txtYPos = self.topTxtGap
-        elif txtYPos > display.get_height():
-            txtYPos = display.get_height() - self.topTxtGap - self.barText.get_height()
+        if self.alignTxtToBar:
+            if txtYPos > bar.y + bar.height - self.topTxtGap - self.barText.get_height() and \
+                    (self.alignTxt == Direction.I_TOP or self.alignTxt == Direction.BOTTOM):
+                txtYPos = bar.y + bar.height - self.topTxtGap - self.barText.get_height()
+        else:
+            if txtYPos < self.topTxtGap:
+                txtYPos = self.topTxtGap
+            elif txtYPos > display.get_height():
+                txtYPos = display.get_height() - self.topTxtGap - self.barText.get_height()
 
         display.blit(self.barText, (txtXPos, txtYPos))
 
@@ -848,7 +865,7 @@ class Board:
         numBoardWidth = len(str(self.width))
         try:
             self.board.sort(key=lambda a: int(str(a.y) + str(a.x).zfill(numBoardWidth)))
-        finally:
+        except AttributeError:
             pass
 
     # FINISH BOARD.TILE class
