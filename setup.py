@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-print('run setup.py')
 
 setup(
     name='PygameCustomLibrary',
