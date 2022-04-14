@@ -107,7 +107,11 @@ class Direction:
     I_BOTTOM = 'ib'
 
 
-# IDEA TAG class
+class Tag:
+    tagList = []
+
+    def __init__(self):
+        Tag.tagList.append(self)
 
 
 # --- Video classes
