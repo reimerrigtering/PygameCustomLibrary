@@ -874,7 +874,6 @@ class Board:
         except AttributeError:
             pass
 
-    # FINISH BOARD.TILE class
     class Tile:
         def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, sortBoard: bool = True,
                      tags: list = None):
@@ -894,6 +893,16 @@ class Board:
                     addToBoard.board.append(self)
                     if sortBoard:
                         addToBoard.sort()
+
+        def check_for_tag(self, tag: Tag = None):
+            if tag in self.tags:
+                return True
+            else:
+                return False
+
+        def render(self, display, xPos: int = 0, yPos: int = 0):
+            if self.sprite is not None:
+                display.blit(self.sprite, (xPos, yPos))
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
