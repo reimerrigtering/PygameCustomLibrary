@@ -862,18 +862,6 @@ class Bar:
 # --- Scene classes
 # FINISH BOARD class
 class Board:
-    def __init__(self, length, width):
-        self.length = length
-        self.width = width
-        self.board = []
-
-    def sort(self):
-        numBoardWidth = len(str(self.width))
-        try:
-            self.board.sort(key=lambda a: int(str(a.y) + str(a.x).zfill(numBoardWidth)))
-        except AttributeError:
-            pass
-
     class Tile:
         def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, sortBoard: bool = True,
                      tags: list = None):
@@ -906,6 +894,48 @@ class Board:
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
+
+    def __init__(self, width: int = 1, length: int = 1, tileSprites: list = None, tileTags: list = None,
+                 generateTiles: bool = True):
+        self.length = length
+        self.width = width
+        self.tileSprites = tileSprites
+        self.board = []
+
+        if generateTiles and tileSprites:
+            for pos in range(width * length):
+                x = pos % width
+                y = pos // width
+                sprite = tileSprites[pos % len(tileSprites)]
+                self.Tile(x, y, sprite, self, tags=tileTags)
+
+    def sort(self):
+        numBoardWidth = len(str(self.width))
+        try:
+            self.board.sort(key=lambda a: int(str(a.y) + str(a.x).zfill(numBoardWidth)))
+        except AttributeError:
+            pass
+
+    def render(self, display, boardRect: tuple = (int, int, int, int)):
+        if self.board:
+            boardLength = boardRect[3]
+            boardWidth = boardRect[4]
+            maxTileX = 0
+            maxTileY = 0
+            for tile in self.board:
+                if tile.x > maxTileX:
+                    maxTileX = tile.x
+                if tile.y > maxTileY:
+                    maxTileY = tile.y
+
+            tileSizeH = boardWidth // maxTileX
+            tileSizeV = boardLength // maxTileY
+
+            for tile in self.board:
+                if tile.sprite is not None:
+                    tileXPos = tile.x * tileSizeH
+                    tileYPos = tile.y * tileSizeV
+                    tile.render(display, tileXPos, tileYPos)
 
     def __repr__(self):
         return str(self.board)
@@ -943,7 +973,7 @@ def help_commands(problem=None):
     Help Menu
     -------------------------------------------------------------------
     Classes:
-    Vector, Frame, Sprite, Animation, Text, Shape, Button, Bar, Board, Board.Tile, Scene
+    Vector, Tag, Frame, Sprite, Animation, Text, Shape, Button, Bar, Board, Board.Tile, Scene
     --------------------------------------------------------------------
     Special Lines:
     Animation.update_cls_list()     --> update all animation frames

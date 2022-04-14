@@ -4,19 +4,12 @@ import pygame
 WIN = pygame.display.set_mode((600, 600))
 pygame.display.set_caption('test')
 
-
-testBar = Bar((30, 30, 40, 300), 100, 100, barColor=(255, 0, 0), barBG=(150, 150, 150, 200),
-              barLevelMeter=True, txtColor=(0, 255, 0), txtBold=True, alignTxt=Direction.I_TOP,
-              fillFromSide=Direction.BOTTOM, alignTxtToBar=True, updateTxtWithRender=True)
+board = Board(10, 10)
 
 
 def update_window():
     WIN.fill((0, 150, 150))
 
-    testBar.txt = f"{testBar.get_meter_percent()}%"
-    testBar.render(WIN)
-
-    Bar.update_cls_list()
     pygame.display.update()
 
 
