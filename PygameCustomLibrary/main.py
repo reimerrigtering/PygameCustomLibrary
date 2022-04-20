@@ -916,7 +916,23 @@ class Board:
         except AttributeError:
             pass
 
-    def render(self, display, boardRect: tuple = (int, int, int, int)):
+    @classmethod
+    def mult_render(cls, display, boardList: list = None):
+        if boardList is not None:
+            maxLength = 1
+            maxWidth = 1
+            for board in boardList:
+                if board.length > maxLength:
+                    maxLength = board.length
+                if board.width > maxWidth:
+                    maxWidth = board.width
+            totalBoard = cls(maxLength, maxWidth)
+            for board in boardList:
+                totalBoard.board += [tile for tile in board.board]
+            totalBoard.sort()
+            totalBoard.render(display)
+
+    def render(self, display, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100)):
         if self.board:
             boardLength = boardRect[3]
             boardWidth = boardRect[4]
