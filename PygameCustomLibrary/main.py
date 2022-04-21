@@ -182,6 +182,7 @@ class Sprite:
         return splitSheetList
 
 
+# TODO: split Animation class --> Animation.Image & Animation.Move
 class Animation:
     current_animations = []
     draw_animations = []
