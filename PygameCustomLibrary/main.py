@@ -127,9 +127,9 @@ class Sprite:
     assetsFolderPath = ''
 
     def __init__(self, source: Union[str, pygame.Surface], x: int = 0, y: int = 0, sheetPath: str = '',
-                 noAssetPath: bool = False):
+                 assetPath: bool = False):
         if type(source) == str:
-            if noAssetPath:
+            if assetPath:
                 self.path = source
             else:
                 if Sprite.assetsFolderPath[-1] != '\\':
