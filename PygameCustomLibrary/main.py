@@ -161,8 +161,8 @@ class Sprite:
         display.blit(self.sprite, (self.x, self.y))
 
     @staticmethod
-    def split_sheet(path: str, imagesOnSheet: int = 1, noAssetPath: bool = False):
-        if not noAssetPath:
+    def split_sheet(path: str, imagesOnSheet: int = 1, assetPath: bool = False):
+        if not assetPath:
             if Sprite.assetsFolderPath[-1] != '\\':
                 Sprite.assetsFolderPath += '\\'
             path = Sprite.assetsFolderPath + path
