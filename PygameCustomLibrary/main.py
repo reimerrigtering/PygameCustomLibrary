@@ -919,8 +919,8 @@ class Board:
 
     def render(self, display, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100)):
         if self.board:
-            boardLength = boardRect[3]
-            boardWidth = boardRect[4]
+            boardLength = boardRect[2]
+            boardWidth = boardRect[3]
             maxTileX = 0
             maxTileY = 0
             for tile in self.board:
