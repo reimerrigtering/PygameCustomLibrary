@@ -934,8 +934,8 @@ class Board:
                 if tile.y > maxTileY:
                     maxTileY = tile.y
 
-            tileSizeH = boardWidth // maxTileX
-            tileSizeV = boardLength // maxTileY
+            tileSizeH = boardWidth // (maxTileX + 1)
+            tileSizeV = boardLength // (maxTileY + 1)
 
             for tile in self.board:
                 if tile.sprite is not None:
