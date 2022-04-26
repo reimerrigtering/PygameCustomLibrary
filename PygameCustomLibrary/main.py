@@ -896,18 +896,23 @@ class Board:
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
 
-    def __init__(self, width: int = 1, length: int = 1, tileSprites: list = None, tileTags: list = None,
-                 generateTiles: bool = True):
+    def __init__(self, width: int = 1, length: int = 1, tileSprites: list = None, spritePattern: list = None,
+                 tileTags: list = None, generateTiles: bool = True):
         self.length = length
         self.width = width
         self.tileSprites = tileSprites
+        self.spritePattern = spritePattern
         self.board = []
 
         if generateTiles and tileSprites:
             for pos in range(width * length):
                 x = pos % width
                 y = pos // width
-                sprite = tileSprites[pos % len(tileSprites)]
+                if spritePattern is None:
+                    sprite = tileSprites[pos % len(tileSprites)]
+                else:
+                    patternIndex = pos % len(spritePattern)
+                    sprite = tileSprites[patternIndex]
                 self.Tile(x, y, sprite, self, tags=tileTags)
 
     def sort(self):
