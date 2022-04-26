@@ -912,7 +912,7 @@ class Board:
                     sprite = tileSprites[pos % len(tileSprites)]
                 else:
                     patternIndex = pos % len(spritePattern)
-                    sprite = tileSprites[patternIndex]
+                    sprite = tileSprites[spritePattern[patternIndex]]
                 self.Tile(x, y, sprite, self, tags=tileTags)
 
     def sort(self):
