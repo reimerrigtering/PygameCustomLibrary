@@ -889,8 +889,11 @@ class Board:
             else:
                 return False
 
-        def render(self, display, xPos: int = 0, yPos: int = 0):
-            if self.sprite is not None:
+        def render(self, display, xPos: int = 0, yPos: int = 0, sprite: Sprite = None):
+            if sprite is not None:
+                display.blit(sprite, (xPos, yPos))
+
+            elif self.sprite is not None:
                 display.blit(self.sprite, (xPos, yPos))
 
         def __repr__(self):
@@ -922,20 +925,25 @@ class Board:
         except AttributeError:
             pass
 
+    def getTileSize(self, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100)):
+        boardLength = boardRect[2]
+        boardWidth = boardRect[3]
+        maxTileX = 0
+        maxTileY = 0
+        for tile in self.board:
+            if tile.x > maxTileX:
+                maxTileX = tile.x
+            if tile.y > maxTileY:
+                maxTileY = tile.y
+
+        tileSizeH = boardWidth // (maxTileX + 1)
+        tileSizeV = boardLength // (maxTileY + 1)
+
+        return tileSizeH, tileSizeV
+
     def render(self, display, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100)):
         if self.board:
-            boardLength = boardRect[2]
-            boardWidth = boardRect[3]
-            maxTileX = 0
-            maxTileY = 0
-            for tile in self.board:
-                if tile.x > maxTileX:
-                    maxTileX = tile.x
-                if tile.y > maxTileY:
-                    maxTileY = tile.y
-
-            tileSizeH = boardWidth // (maxTileX + 1)
-            tileSizeV = boardLength // (maxTileY + 1)
+            tileSizeH, tileSizeV = self.getTileSize(boardRect)
 
             for tile in self.board:
                 if tile.sprite is not None:
