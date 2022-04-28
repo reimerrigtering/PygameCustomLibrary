@@ -4,6 +4,9 @@ import pygame
 WIN = pygame.display.set_mode((600, 600))
 pygame.display.set_caption('test')
 
+hi = Tag()
+print(hi)
+
 board = Board(10, 10)
 
 

@@ -113,9 +113,6 @@ class Tag:
     def __init__(self):
         Tag.tagList.append(self)
 
-    def __repr__(self):
-        return f'{self}'
-
 
 # --- Video classes
 class Frame:
