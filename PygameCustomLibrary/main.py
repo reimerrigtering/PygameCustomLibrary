@@ -144,7 +144,7 @@ class Sprite:
         self.x = x
         self.y = y
 
-    def render(self, display, scale: tuple[int, int] = None, scaleFactor: float = 1.0):
+    def render(self, display, pos: tuple[int, int] = None, scale: tuple[int, int] = None, scaleFactor: float = 1.0):
         if scale is not None:
             self.sprite = pygame.transform.scale(self.sprite, (scale[0], scale[1]))
 
@@ -158,7 +158,10 @@ class Sprite:
             self.width = self.sprite.get_width()
             self.height = self.sprite.get_height()
 
-        display.blit(self.sprite, (self.x, self.y))
+        if pos is None:
+            display.blit(self.sprite, (self.x, self.y))
+        else:
+            display.blit(self.sprite, pos)
 
     @staticmethod
     def split_sheet(path: str, imagesOnSheet: int = 1, assetPath: bool = False):
