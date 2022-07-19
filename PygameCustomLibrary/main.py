@@ -126,8 +126,8 @@ class Frame:
 class Sprite:
     assetsFolderPath = ''
 
-    def __init__(self, source: Union[str, pygame.Surface], x: int = 0, y: int = 0, sheetPath: str = '',
-                 alpha: bool = False, assetPath: bool = False):
+    def __init__(self, source: Union[str, pygame.Surface], x: int = 0, y: int = 0, resize: tuple[int, int] = None,
+                 sheetPath: str = '', alpha: bool = False, assetPath: bool = False):
         if type(source) == str:
             if assetPath:
                 self.path = source
@@ -139,6 +139,9 @@ class Sprite:
         else:
             self.path = sheetPath
             self.sprite = source
+
+        if resize is not None:
+            self.sprite = pygame.transform.scale(self.sprite, resize)
 
         if alpha:
             self.sprite.convert_alpha()
