@@ -901,7 +901,10 @@ class Board:
                 display.blit(sprite, (xPos, yPos))
 
             elif self.sprite is not None:
-                self.sprite.render(display, pos=(xPos, yPos))
+                if type(self.sprite) == Sprite:
+                    self.sprite.render(display, pos=(xPos, yPos))
+                else:
+                    display.blit(self.sprite, (xPos, yPos))
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
