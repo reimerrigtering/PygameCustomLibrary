@@ -127,7 +127,7 @@ class Sprite:
     assetsFolderPath = ''
 
     def __init__(self, source: Union[str, pygame.Surface], x: int = 0, y: int = 0, sheetPath: str = '',
-                 assetPath: bool = False):
+                 alpha: bool = False, assetPath: bool = False):
         if type(source) == str:
             if assetPath:
                 self.path = source
@@ -139,6 +139,10 @@ class Sprite:
         else:
             self.path = sheetPath
             self.sprite = source
+
+        if alpha:
+            self.sprite.convert_alpha()
+
         self.width = self.sprite.get_width()
         self.height = self.sprite.get_height()
         self.x = x
