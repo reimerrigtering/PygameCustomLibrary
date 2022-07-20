@@ -947,6 +947,7 @@ class Board:
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
 
     def __init__(self, width: int = 1, length: int = 1, tileSprites: list = None, spritePattern: list = None,
+                 bgColors: list = None, bgColorPattern: list = None, tileBgSprite: Sprite = None,
                  tileTags: list = None, generateTiles: bool = True, alignSprite: Direction = Direction.CENTER):
         self.length = length
         self.width = width
@@ -964,7 +965,16 @@ class Board:
                 else:
                     patternIndex = pos % len(spritePattern)
                     sprite = tileSprites[spritePattern[patternIndex]]
-                self.Tile(x, y, sprite, self, tags=tileTags)
+
+                if bgColors:
+                    if bgColorPattern is None:
+                        bg = bgColors[pos % len(bgColors)]
+                    else:
+                        patternIndex = pos % len(bgColorPattern)
+                        bg = bgColors[bgColorPattern[patternIndex]]
+                else:
+                    bg = None
+                self.Tile(x, y, sprite, bgColor=bg, bgSprite=tileBgSprite, addToBoard=self, tags=tileTags)
 
     def sort(self):
         numBoardWidth = len(str(self.width))
