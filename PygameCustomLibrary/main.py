@@ -956,15 +956,18 @@ class Board:
         self.alignSprite = alignSprite
         self.board = []
 
-        if generateTiles and tileSprites:
+        if generateTiles:
             for pos in range(width * length):
                 x = pos % width
                 y = pos // width
-                if spritePattern is None:
-                    sprite = tileSprites[pos % len(tileSprites)]
+                if tileSprites:
+                    if spritePattern is None:
+                        sprite = tileSprites[pos % len(tileSprites)]
+                    else:
+                        patternIndex = pos % len(spritePattern)
+                        sprite = tileSprites[spritePattern[patternIndex]]
                 else:
-                    patternIndex = pos % len(spritePattern)
-                    sprite = tileSprites[spritePattern[patternIndex]]
+                    sprite = None
 
                 if bgColors:
                     if bgColorPattern is None:
