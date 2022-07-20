@@ -874,8 +874,9 @@ class Bar:
 # FINISH BOARD class
 class Board:
     class Tile:
-        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, bgColor: tuple[int, int, int] = None,
-                     bgSprite: Sprite = None, addToBoard=None, sortBoard: bool = True, tags: list = None):
+        def __init__(self, x: int = 0, y: int = 0, sprite: Union[Sprite, pygame.Surface] = None,
+                     bgColor: tuple[int, int, int] = None, bgSprite: Sprite = None, addToBoard=None,
+                     sortBoard: bool = True, tags: list = None):
             self.x = x
             self.y = y
             self.sprite = sprite
@@ -915,8 +916,12 @@ class Board:
             if drawBG:
                 display.blit(bg, (position[0], position[1]))
 
-            dHor = (position[2] - self.sprite.width) / 2
-            dVer = (position[3] - self.sprite.height) / 2
+            if type(self.sprite) == Sprite:
+                dHor = (position[2] - self.sprite.width) / 2
+                dVer = (position[3] - self.sprite.height) / 2
+            else:
+                dHor = (position[2] - self.sprite.get_width()) / 2
+                dVer = (position[3] - self.sprite.get_height()) / 2
 
             if self.board.alignSprite == Direction.RIGHT:
                 addX = 0
