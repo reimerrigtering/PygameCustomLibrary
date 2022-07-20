@@ -874,11 +874,13 @@ class Bar:
 # FINISH BOARD class
 class Board:
     class Tile:
-        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, addToBoard=None, sortBoard: bool = True,
-                     tags: list = None):
+        def __init__(self, x: int = 0, y: int = 0, sprite: Sprite = None, bgColor: tuple[int, int, int] = None,
+                     bgSprite: Sprite = None, addToBoard=None, sortBoard: bool = True, tags: list = None):
             self.x = x
             self.y = y
             self.sprite = sprite
+            self.bgColor = bgColor
+            self.bgSprite = bgSprite
             self.board = addToBoard
             self.tags = tags
 
@@ -899,25 +901,58 @@ class Board:
             else:
                 return False
 
-        def render(self, display, xPos: int = 0, yPos: int = 0, sprite: Sprite = None):
+        def render(self, display, position: tuple[int, int, int, int] = (0, 0, 100, 100), sprite: Sprite = None):
+            drawBG = False
+            bg = pygame.Surface(position[2], position[3])
+            if self.bgColor is not None:
+                bg.fill(self.bgColor)
+                drawBG = True
+
+            if self.bgSprite is not None:
+                self.bgSprite.render(bg, (position[0], position[1]), (position[2], position[3]))
+                drawBG = True
+
+            if drawBG:
+                display.blit(bg, (position[0], position[1]))
+
+            dHor = (position[2] - self.sprite.width) / 2
+            dVer = (position[3] - self.sprite.height) / 2
+
+            if self.board.alignSprite == Direction.RIGHT:
+                addX = 0
+                addY = dVer
+            elif self.board.alignSprite == Direction.LEFT:
+                addX = 2 * dHor
+                addY = dVer
+            elif self.board.alignSprite == Direction.TOP:
+                addX = dHor
+                addY = 0
+            elif self.board.alignSprite == Direction.BOTTOM:
+                addX = dHor
+                addY = 2 * dVer
+            else:
+                addX = dHor
+                addY = dVer
+
             if sprite is not None:
-                display.blit(sprite, (xPos, yPos))
+                display.blit(sprite, (position[0] + addX, position[1] + addY))
 
             elif self.sprite is not None:
                 if type(self.sprite) == Sprite:
-                    self.sprite.render(display, pos=(xPos, yPos))
+                    self.sprite.render(display, pos=(position[0] + addX, position[1] + addY))
                 else:
-                    display.blit(self.sprite, (xPos, yPos))
+                    display.blit(self.sprite, (position[0] + addX, position[1] + addY))
 
         def __repr__(self):
             return f"Tile pos = {self.x}, {self.y} - Board = {self.board}"
 
     def __init__(self, width: int = 1, length: int = 1, tileSprites: list = None, spritePattern: list = None,
-                 tileTags: list = None, generateTiles: bool = True):
+                 tileTags: list = None, generateTiles: bool = True, alignSprite: Direction = Direction.CENTER):
         self.length = length
         self.width = width
         self.tileSprites = tileSprites
         self.spritePattern = spritePattern
+        self.alignSprite = alignSprite
         self.board = []
 
         if generateTiles and tileSprites:
@@ -962,10 +997,10 @@ class Board:
                 if tile.sprite is not None:
                     tileXPos = tile.x * tileSizeH
                     tileYPos = tile.y * tileSizeV
-                    tile.render(display, tileXPos, tileYPos)
+                    tile.render(display, (tileXPos, tileYPos, tileSizeH, tileSizeV))
 
     @classmethod
-    def mult_render(cls, display, boardList: list = None):
+    def mult_render(cls, display, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100), boardList: list = None):
         if boardList is not None:
             maxLength = 1
             maxWidth = 1
@@ -978,7 +1013,7 @@ class Board:
             for board in boardList:
                 totalBoard.board += [tile for tile in board.board]
             totalBoard.sort()
-            totalBoard.render(display)
+            totalBoard.render(display, boardRect)
 
     def __repr__(self):
         return str(self.board)
