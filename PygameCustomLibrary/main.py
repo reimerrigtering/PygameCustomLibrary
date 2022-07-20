@@ -903,7 +903,7 @@ class Board:
 
         def render(self, display, position: tuple[int, int, int, int] = (0, 0, 100, 100), sprite: Sprite = None):
             drawBG = False
-            bg = pygame.Surface(position[2], position[3])
+            bg = pygame.Surface((position[2], position[3]))
             if self.bgColor is not None:
                 bg.fill(self.bgColor)
                 drawBG = True
