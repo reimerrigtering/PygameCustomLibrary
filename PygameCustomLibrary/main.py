@@ -127,7 +127,8 @@ class Sprite:
     assetsFolderPath = ''
 
     def __init__(self, source: Union[str, pygame.Surface], x: int = 0, y: int = 0, resize: tuple[int, int] = None,
-                 sheetPath: str = '', alpha: bool = False, assetPath: bool = False):
+                 sheetPath: str = '', alpha: bool = False, alphaColor: tuple[int, int, int] = (0, 0, 0),
+                 assetPath: bool = False):
         if type(source) == str:
             if assetPath:
                 self.path = source
@@ -144,6 +145,7 @@ class Sprite:
             self.sprite = pygame.transform.scale(self.sprite, resize)
 
         if alpha:
+            self.sprite.set_colorkey(alphaColor)
             self.sprite.convert_alpha()
 
         self.width = self.sprite.get_width()
