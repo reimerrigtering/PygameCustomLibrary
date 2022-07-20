@@ -994,8 +994,8 @@ class Board:
             pass
 
     def getTileSize(self, boardRect: tuple[int, int, int, int] = (0, 0, 100, 100)):
-        boardLength = boardRect[2]
-        boardWidth = boardRect[3]
+        boardLength = boardRect[3]
+        boardWidth = boardRect[2]
         maxTileX = 0
         maxTileY = 0
         for tile in self.board:
