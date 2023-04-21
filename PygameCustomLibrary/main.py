@@ -405,7 +405,7 @@ class Button:
         self.buttonShadowColor = buttonShadowColor
         self.buttonShadowDepth = buttonShadowDepth
         self.buttonPressed = buttonPressed
-        if self.func is not None:
+        if response_func is not None:
             self.func = response_func(**kwargs)
         else:
             self.func = None
