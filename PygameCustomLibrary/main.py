@@ -405,7 +405,10 @@ class Button:
         self.buttonShadowColor = buttonShadowColor
         self.buttonShadowDepth = buttonShadowDepth
         self.buttonPressed = buttonPressed
-        self.func = response_func(**kwargs)
+        if self.func is not None:
+            self.func = response_func(**kwargs)
+        else:
+            self.func = None
 
         if buttonType not in Button.BUTTON_TYPES:
             self.buttonType = 'switch'
