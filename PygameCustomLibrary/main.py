@@ -1,5 +1,5 @@
 import pygame
-from typing import Union
+from typing import Union, Callable
 from math import sin, cos, atan, sqrt, degrees, radians
 pygame.font.init()
 
@@ -386,7 +386,7 @@ class Button:
                  alignImg: str = Direction.CENTER, imgSize: tuple[int, int] = None, topImgGap: int = 5,
                  sideImgGap: int = 5, button3D: bool = False, buttonShadowColor: tuple[int, int, int] = (0, 0, 0),
                  buttonShadowDepth: int = 3, buttonPressed: bool = False, buttonType: str = 'switch',
-                 inButtonList: bool = True, response_func=None, **kwargs):
+                 inButtonList: bool = True, response_func: Callable = None, **kwargs):
 
         self.buttonColor = buttonColor
         self.txt = txt
