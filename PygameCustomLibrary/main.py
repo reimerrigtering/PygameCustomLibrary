@@ -386,7 +386,7 @@ class Button:
                  alignImg: str = Direction.CENTER, imgSize: tuple[int, int] = None, topImgGap: int = 5,
                  sideImgGap: int = 5, button3D: bool = False, buttonShadowColor: tuple[int, int, int] = (0, 0, 0),
                  buttonShadowDepth: int = 3, buttonPressed: bool = False, buttonType: str = 'switch',
-                 inButtonList: bool = True):
+                 inButtonList: bool = True, response_func=None, **kwargs):
 
         self.buttonColor = buttonColor
         self.txt = txt
@@ -405,6 +405,7 @@ class Button:
         self.buttonShadowColor = buttonShadowColor
         self.buttonShadowDepth = buttonShadowDepth
         self.buttonPressed = buttonPressed
+        self.func = response_func(**kwargs)
 
         if buttonType not in Button.BUTTON_TYPES:
             self.buttonType = 'switch'
@@ -447,6 +448,10 @@ class Button:
             Button.buttonList.append(self)
             if self.buttonType == 'push':
                 Button.pushButtonList.append(self)
+
+    def run_response_func(self):
+        if self.func is not None:
+            self.func()
 
     def update_button_txt(self):
         buttonFont = pygame.font.SysFont(self.font, self.fontSize, self.txtBold, self.txtItalic)
@@ -543,7 +548,7 @@ class Button:
         for button in cls.pushButtonList:
             button.buttonPressed = False
 
-    def check_mouse_collision(self, scene=None, updateButtonState: bool = True):
+    def check_mouse_collision(self, scene=None, updateButtonState: bool = True, run_response: bool = True):
         if scene is not None:
             if not scene.check_object_in_scene(self):
                 return False
@@ -552,6 +557,9 @@ class Button:
         if self.buttonRect.colliderect(mouseHitbox):
             if updateButtonState:
                 self.buttonPressed = not self.buttonPressed
+
+            if run_response:
+                self.run_response_func()
             return True
         else:
             return False
